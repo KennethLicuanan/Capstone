@@ -1,0 +1,19 @@
+/*navbar*/
+.navbar-nav{
+    margin-left: 50%;
+    font-weight: bold;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+.navbar-brand{
+    font-weight: bold;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+.navbar.custom-color .navbar-brand,
+.navbar.custom-color .nav-link {
+    color: #ffffff !important; /* Set text color to white */
+}
+.custom-color{
+    background-color: rgb(0, 0, 0);
+    
+}
+
