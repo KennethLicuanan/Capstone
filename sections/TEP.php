@@ -219,18 +219,19 @@ $result = $conn->query($query);
 <body>
 
 <div class="sidebar">
-    <div class="sidebar-brand">
-        <img src="imgs/logo.jpg" height="50" alt="Digi-Studies"> Digi - Studies
+        <div class="sidebar-brand">
+            <img src="imgs/logo.jpg" height="50" alt="Digi-Studies"> Digi - Studies
+        </div>
+        <a href="../dashboard.php"><i class="fas fa-home"></i> Home</a>
+        <a href="IT.php"><i class="fas fa-laptop"></i> College of Computer Studies</a>
+        <a href="BA.php"><i class="fas fa-briefcase"></i> Business Administration</a>
+        <a href="TEP.php"><i class="fas fa-chalkboard-teacher"></i> Teachers Education Program</a>
+        <a href="../analytics.php"><i class="fas fa-blackboard"></i> Studies Analysis</a>
+        <a href="../add_favorite.php"><i class="fas fa-star"></i> Favorites</a>
+        <a href="../notification.php"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="../help.php"><i class="fas fa-pencil"></i> Help</a>
+        <a href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
-    <a href="../dashboard.php"><i class="fas fa-home"></i> Home</a>
-    <a href="IT.php"><i class="fas fa-laptop"></i> College of Computer Studies</a>
-    <a href="BA.php"><i class="fas fa-briefcase"></i> Business Administration</a>
-    <a href="TEP.php"><i class="fas fa-chalkboard-teacher"></i> Teachers Education Program</a>
-    <a href="../add_favorite.php"><i class="fas fa-star"></i> Favorites</a>
-    <a href="../notification.php"><i class="fas fa-bell"></i> Notifications</a>
-    <a href="../help.php"><i class="fas fa-pencil"></i> Help</a>
-    <a href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
 
 <div class="content">
     <!-- Search Form -->

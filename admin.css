@@ -6,6 +6,7 @@
 }
 .navbar-brand{
     font-weight: bold;
+    font-family: cursive;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 .navbar.custom-color .navbar-brand,

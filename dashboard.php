@@ -19,59 +19,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch total studies for each course
-$courseCounts = [
-    'IT' => 0,
-    'TEP' => 0,
-    'BA' => 0
-];
-
-$courses = array_keys($courseCounts);
-foreach ($courses as $course) {
-    $query = "SELECT COUNT(*) as total FROM categorytbl WHERE course = '$course'";
-    $result = $conn->query($query);
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $courseCounts[$course] = $row['total'];
-    }
-}
-
-// Fetch IT studies by type
-$studyTypes = ['IoT', 'Web-Based', 'Web-Application', 'Mobile Application'];
-$typeCounts = [];
-foreach ($studyTypes as $type) {
-    $query = "SELECT COUNT(*) as total FROM categorytbl WHERE course = 'IT' AND type = '$type'";
-    $result = $conn->query($query);
-    $typeCounts[$type] = $result->num_rows > 0 ? $result->fetch_assoc()['total'] : 0;
-}
-
-// Fetch BA studies by type
-$baTypes = ['Financial Management', 'Marketing Management', 'Operations Management'];
-$baTypeCounts = [];
-foreach ($baTypes as $type) {
-    $query = "SELECT COUNT(*) as total FROM categorytbl WHERE course = 'BA' AND type = '$type'";
-    $result = $conn->query($query);
-    $baTypeCounts[$type] = $result->num_rows > 0 ? $result->fetch_assoc()['total'] : 0;
-}
-
-// Fetch TEP studies by type
-$tepTypes = ['Early Childhood', 'Elementary Education', 'Secondary Education'];
-$tepTypeCounts = [];
-foreach ($tepTypes as $type) {
-    $query = "SELECT COUNT(*) as total FROM categorytbl WHERE course = 'TEP' AND type = '$type'";
-    $result = $conn->query($query);
-    $tepTypeCounts[$type] = $result->num_rows > 0 ? $result->fetch_assoc()['total'] : 0;
-}
-
-// Fetch studies per year
-$yearlyCounts = [];
-$query = "SELECT year, COUNT(*) as total FROM studytbl GROUP BY year";
-$result = $conn->query($query);
-while ($row = $result->fetch_assoc()) {
-    $yearlyCounts[$row['year']] = $row['total'];
-}
-
-
 $conn->close();
 ?>
 
@@ -84,6 +31,7 @@ $conn->close();
     <link rel="stylesheet" href="admin.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -120,28 +68,54 @@ $conn->close();
         .sidebar .sidebar-brand img {
             border-radius: 50%;
         }
-        h3{
-            margin-top: 15px;
-            text-align: center;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-            font-weight: bold;
-        }
-        h2 {
-            margin-top: 15px;
-            text-align: center;
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-            font-weight: bold;
-        }
-        .flex-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 5%;
-            flex-wrap: wrap;
-        }
-        .chart-container {
-            width: 30%;
-        }
+
+
+
+            /* Styling the search input and button */
+    .input-group .form-control {
+        border-radius: 50px;
+        padding-left: 20px;
+        font-size: 14px;
+    }
+
+    .input-group button {
+        border-radius: 50px;
+        padding: 10px 20px;
+        font-size: 14px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Navbar burger menu */
+    .navbar-toggler {
+        border: none;
+        background-color: transparent;
+    }
+
+    .navbar-toggler-icon {
+        background-color: #007bff;
+    }
+
+    /* Styling form select elements */
+    .form-select {
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    /* Make the navbar slightly elevated */
+    .navbar {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Label styling */
+    .form-label {
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    /* Adding smooth transition for dropdowns */
+    .form-select, .navbar-toggler {
+        transition: all 0.3s ease-in-out;
+    }
     </style>
 </head>
 <body>
@@ -154,284 +128,271 @@ $conn->close();
         <a href="./sections/IT.php"><i class="fas fa-laptop"></i> College of Computer Studies</a>
         <a href="./sections/BA.php"><i class="fas fa-briefcase"></i> Business Administration</a>
         <a href="./sections/TEP.php"><i class="fas fa-chalkboard-teacher"></i> Teachers Education Program</a>
+        <a href="analytics.php"><i class="fas fa-blackboard"></i> Studies Analysis</a>
         <a href="add_favorite.php"><i class="fas fa-star"></i> Favorites</a>
         <a href="notification.php"><i class="fas fa-bell"></i> Notifications</a>
         <a href="help.php"><i class="fas fa-pencil"></i> Help</a>
         <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
-<h2>Data Analytics</h2>
-
-<div class="flex-container">
-    <div class="chart-container">
-        <h3>Overall Studies</h3>
-        <canvas id="studiesChart"></canvas>
-    </div>
-    <div class="chart-container">
-        <h3>Information Technology Studies</h3>
-        <canvas id="itTypesChart"></canvas>
-    </div>
-    <div class="chart-container">
-        <h3>Business Administration Studies</h3>
-        <canvas id="baTypesChart"></canvas>
-    </div>
-    <div class="chart-container">
-        <h3>Teachers Education Program Studies</h3>
-        <canvas id="tepTypesChart"></canvas>
-    </div>
-    <div class="chart-container">
-        <h3>Studies Per Year</h3>
-        <canvas id="yearlyChart" width="400" height="400"></canvas>
+    <div class="container mt-4">
+    <!-- Search Box -->
+    <div class="input-group mb-4">
+        <input type="text" id="searchInput" class="form-control border-0 shadow-sm rounded-pill" placeholder="Search studies by title, author, or keywords">
+        <button class="btn btn-primary shadow-sm rounded-pill" onclick="performSearch()">Search</button>
     </div>
 
+    <!-- Burger Menu for Filters -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light rounded shadow-sm mb-3">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarFilters" aria-controls="navbarFilters" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarFilters">
+            <div class="row mb-3">
+                <div class="col-md-6 mb-2 mb-md-0">
+                    <label for="yearFilter" class="form-label text-muted">Filter by Year</label>
+                    <select id="yearFilter" class="form-select shadow-sm rounded" onchange="applyFilters()">
+                        <option value="">All Years</option>
+                        <!-- Populate dynamically -->
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="courseFilter" class="form-label text-muted">Filter by Course</label>
+                    <select id="courseFilter" class="form-select shadow-sm rounded" onchange="applyFilters()">
+                        <option value="">All Courses</option>
+                        <!-- Populate dynamically -->
+                    </select>
+                </div>
+            </div>
+        </div>
+    </nav>
 </div>
 
+
+<!-- Search Results Modal -->
+<div class="modal fade" id="searchResultsModal" tabindex="-1" aria-labelledby="searchResultsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchResultsLabel">Search Results</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="searchResultsList" class="list-group"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Message Modal -->
+<div class="modal fade" id="courseMessageModal" tabindex="-1" aria-labelledby="courseMessageLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="courseMessageLabel">Notice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="courseMessageBody">
+                <!-- Message will be injected dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
-    // Pass PHP data to JavaScript
-    const courseData = {
-        IT: <?php echo $courseCounts['IT']; ?>,
-        TEP: <?php echo $courseCounts['TEP']; ?>,
-        BA: <?php echo $courseCounts['BA']; ?>
-    };
+document.addEventListener('DOMContentLoaded', () => {
+    populateFilters(); // Populate filters on page load
+});
 
-    const itTypeData = {
-        IoT: <?php echo $typeCounts['IoT']; ?>,
-        "Web-Based": <?php echo $typeCounts['Web-Based']; ?>,
-        "Web-Application": <?php echo $typeCounts['Web-Application']; ?>,
-        "Mobile Application": <?php echo $typeCounts['Mobile Application']; ?>
-    };
+function populateFilters() {
+    fetch('filters.php')
+        .then(response => response.json())
+        .then(data => {
+            const yearFilter = document.getElementById('yearFilter');
+            const courseFilter = document.getElementById('courseFilter');
 
-    const baTypeData = {
-        "Financial Management": <?php echo $baTypeCounts['Financial Management']; ?>,
-        "Marketing Management": <?php echo $baTypeCounts['Marketing Management']; ?>,
-        "Operations Management": <?php echo $baTypeCounts['Operations Management']; ?>
-    };
+            // Populate years
+            data.years.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearFilter.appendChild(option);
+            });
 
-    const tepTypeData = {
-        "Early Childhood": <?php echo $tepTypeCounts['Early Childhood']; ?>,
-        "Elementary Education": <?php echo $tepTypeCounts['Elementary Education']; ?>,
-        "Secondary Education": <?php echo $tepTypeCounts['Secondary Education']; ?>
-    };
+            // Populate courses
+            data.courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course;
+                option.textContent = course;
+                courseFilter.appendChild(option);
+            });
+        });
+}
 
-    // Pass studies per year data to JavaScript
-    const yearlyData = <?php echo json_encode($yearlyCounts); ?>;
+function applyFilters() {
+    const year = document.getElementById('yearFilter').value;
+    const course = document.getElementById('courseFilter').value;
 
+    fetch(`search.php?year=${encodeURIComponent(year)}&course=${encodeURIComponent(course)}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultsList = document.getElementById('searchResultsList');
+            resultsList.innerHTML = '';
 
-   // Render Total Studies by Course Chart
-   const ctxCourse = document.getElementById('studiesChart').getContext('2d');
-    new Chart(ctxCourse, {
-        type: 'pie',
-        data: {
-            labels: ['Information Technology', 'Teachers Education Program', 'Business Administration'],
-            datasets: [{
-                label: 'Total Studies by Course',
-                data: [courseData.IT, courseData.TEP, courseData.BA],
-                backgroundColor: ['#2A9D8F', '#E9C46A', '#F4A261'],
-                hoverBackgroundColor: ['#2A9D8F99', '#E9C46A99', '#F4A26199'],
-                borderColor: 'transparent',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 14,
-                            family: 'Arial, sans-serif',
-                        },
-                        color: '#333',
-                    },
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: { size: 14 },
-                    bodyFont: { size: 12 },
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.raw || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(2);
-                            return `${label}: ${value} studies (${percentage}%)`;
-                        }
-                    }
-                }
+            if (data.length > 0) {
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.innerHTML = `
+                        <strong>Title:</strong> ${item.title}<br>
+                        <strong>Author:</strong> ${item.author}<br>
+                        <strong>Keywords:</strong> ${item.keywords}<br>
+                        <strong>Year:</strong> ${item.year}<br>
+                        <strong>Course:</strong> ${item.course}
+                    `;
+
+                    // Attach click event
+                    listItem.addEventListener('click', () => {
+                        handleStudyClick(item.course);
+                    });
+
+                    resultsList.appendChild(listItem);
+                });
+            } else {
+                resultsList.innerHTML = '<li class="list-group-item">No results found.</li>';
             }
-        }
-    });
 
-    // Render IT Studies by Type Chart
-    const ctxITTypes = document.getElementById('itTypesChart').getContext('2d');
-    new Chart(ctxITTypes, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(itTypeData),
-            datasets: [{
-                label: 'IT Studies by Type',
-                data: Object.values(itTypeData),
-                backgroundColor: ['#264653', '#2A9D8F', '#E76F51', '#F4A261'],
-                hoverBackgroundColor: ['#26465399', '#2A9D8F99', '#E76F5199', '#F4A26199'],
-                borderColor: 'transparent',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 14,
-                            family: 'Arial, sans-serif',
-                        },
-                        color: '#333',
-                    },
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: { size: 14 },
-                    bodyFont: { size: 12 },
-                }
-            }
-        }
-    });
+            // Show the modal
+            new bootstrap.Modal(document.getElementById('searchResultsModal')).show();
+        });
+}
 
-    // Render BA Studies by Type Chart
-    const ctxBATypes = document.getElementById('baTypesChart').getContext('2d');
-    new Chart(ctxBATypes, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(baTypeData),
-            datasets: [{
-                label: 'BA Studies by Type',
-                data: Object.values(baTypeData),
-                backgroundColor: ['#264653', '#2A9D8F', '#E76F51', '#F4A261'],
-                hoverBackgroundColor: ['#26465399', '#2A9D8F99', '#E76F5199', '#F4A26199'],
-                borderColor: 'transparent',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 14,
-                            family: 'Arial, sans-serif',
-                        },
-                        color: '#333',
-                    },
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: { size: 14 },
-                    bodyFont: { size: 12 },
-                }
-            }
-        }
-    });
+function performSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    const year = document.getElementById('yearFilter').value;
+    const course = document.getElementById('courseFilter').value;
 
-    // Render TEP Studies by Type Chart
-    const ctxTEPTypes = document.getElementById('tepTypesChart').getContext('2d');
-    new Chart(ctxTEPTypes, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(tepTypeData),
-            datasets: [{
-                label: 'TEP Studies by Type',
-                data: Object.values(tepTypeData),
-                backgroundColor: ['#264653', '#2A9D8F', '#E76F51', '#F4A261'],
-                hoverBackgroundColor: ['#26465399', '#2A9D8F99', '#E76F5199', '#F4A26199'],
-                borderColor: 'transparent',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            size: 14,
-                            family: 'Arial, sans-serif',
-                        },
-                        color: '#333',
-                    },
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: { size: 14 },
-                    bodyFont: { size: 12 },
-                }
-            }
-        }
-    });
+    if (query === '') {
+        alert('Please enter a search query.');
+        return;
+    }
 
-        // Render Studies Per Year Chart
-        const ctxYearly = document.getElementById('yearlyChart').getContext('2d');
-    new Chart(ctxYearly, {
-        type: 'bar',
-        data: {
-            labels: Object.keys(yearlyData),
-            datasets: [{
-                label: 'Number of Studies',
-                data: Object.values(yearlyData),
-                backgroundColor: ['#2A9D8F99'],
-                borderColor: '#2A9D8F',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        font: {
-                            size: 14,
-                            family: 'Arial, sans-serif',
-                        },
-                        color: '#333',
-                    },
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    titleFont: { size: 14 },
-                    bodyFont: { size: 12 },
-                }
-            },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    title: {
-                        display: true,
-                        text: 'Year',
-                        font: { size: 14 },
-                        color: '#555',
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#ddd' },
-                    title: {
-                        display: true,
-                        text: 'Number of Studies',
-                        font: { size: 14 },
-                        color: '#555',
-                    }
-                }
+    fetch(`search.php?q=${encodeURIComponent(query)}&year=${encodeURIComponent(year)}&course=${encodeURIComponent(course)}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultsList = document.getElementById('searchResultsList');
+            resultsList.innerHTML = '';
+
+            if (data.length > 0) {
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.innerHTML = `
+                        <strong>Title:</strong> ${item.title}<br>
+                        <strong>Author:</strong> ${item.author}<br>
+                        <strong>Keywords:</strong> ${item.keywords}<br>
+                        <strong>Year:</strong> ${item.year}<br>
+                        <strong>Course:</strong> ${item.course}
+                    `;
+
+                    // Attach click event
+                    listItem.addEventListener('click', () => {
+                        handleStudyClick(item.course);
+                    });
+
+                    resultsList.appendChild(listItem);
+                });
+            } else {
+                resultsList.innerHTML = '<li class="list-group-item">No results found.</li>';
             }
-        }
-    });
+
+            // Show the modal
+            new bootstrap.Modal(document.getElementById('searchResultsModal')).show();
+        });
+}
+
+function handleStudyClick(course) {
+    const message = `If you want to view the full abstract of this study, please direct to the ${course} section for more specific details.`;
+    const courseMessageBody = document.getElementById('courseMessageBody');
+    courseMessageBody.textContent = message;
+
+    // Show the modal
+    const courseMessageModal = new bootstrap.Modal(document.getElementById('courseMessageModal'));
+    courseMessageModal.show();
+}
+
 </script>
 
+
+    <div class="content">
+    <style>
+        .content {
+            display: flex;
+            flex-direction: column; /* Align images in a vertical list */
+            align-items: center; /* Center-align the images */
+            gap: 20px; /* Add spacing between the images */
+            padding: 20px;
+            background-color: #f9f9f9; /* Light, modern background */
+        }
+
+        .content img {
+            width: 90%; /* Responsive width relative to the container */
+            max-width: 800px; /* Limit the max size for large screens */
+            height: auto; /* Maintain aspect ratio */
+            object-fit: cover; /* Ensure images are cropped proportionally */
+            border-radius: 12px; /* Add rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .content img:hover {
+            transform: scale(1.02); /* Slight zoom on hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+        }
+
+        .content h1,
+.content p {
+    font-family: 'Poppins', Arial, sans-serif; /* Modern sans-serif font */
+    font-size: 24px; /* Uniform font size */
+    font-weight: 600; /* Semi-bold for better emphasis */
+    color: #2c3e50; /* Sleek dark blue-gray for modern aesthetics */
+    letter-spacing: 0.5px; /* Slight letter spacing for clarity */
+    line-height: 1.8; /* Improved line height for readability */
+    margin: 15px 0; /* Balanced margins for spacing */
+    text-align: left; /* Align text to the left for a clean layout */
+}
+
+.content h1 {
+    font-size: 32px; /* Slightly larger size for the heading */
+    font-weight: 700; /* Bolder heading for hierarchy */
+    color: #34495e; /* Darker shade for contrast */
+    text-transform: uppercase; /* Make heading more prominent */
+    border-bottom: 2px solid #3498db; /* Modern underline effect */
+    padding-bottom: 5px; /* Spacing for the underline */
+    margin-bottom: 20px; /* Extra margin to separate from other text */
+}
+
+.content p {
+    font-size: 18px; /* Slightly smaller size for paragraph */
+    color: #555; /* Softer text color for readability */
+    text-align: justify; /* Justify text for a clean block alignment */
+}
+
+    </style>
+<br>
+    <h1>Welcome to Digi-Studies</h1>
+    <p>Your Guide in Research Finding</p>
+    <img class="ccs" src="imgs/ccs.jpg" alt="CCS">
+    <img class="bsba" src="imgs/bsba.jpg" alt="BSBA">
+    <img class="tep" src="imgs/tep.jpg" alt="TEP">
+</div>
+
+<!-- Add Bootstrap JS for the burger menu toggle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
