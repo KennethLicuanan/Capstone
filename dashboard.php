@@ -185,6 +185,78 @@ $conn->close();
 </div>
 
 <!-- Course Message Modal -->
+ <style>
+    /* Style for the modal content */
+.modal-content {
+    background-color: #f9f9f9; /* Light background */
+    border: 2px solid #5cb85c; /* Green Archers theme color */
+    border-radius: 12px; /* Smooth rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+/* Style for the modal header */
+.modal-header {
+    background-color: darkblue; /* Theme green background */
+    color: #fff; /* White text */
+    border-bottom: 1px solid #4cae4c; /* Slightly darker border */
+    padding: 15px;
+    border-top-left-radius: 10px; /* Match content radius */
+    border-top-right-radius: 10px;
+}
+
+/* Title styling */
+.modal-title {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase; /* Make title standout */
+    margin: 0;
+}
+
+/* Style for close button */
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #fff;
+    opacity: 0.7;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+/* Style for the modal body */
+.modal-body {
+    padding: 20px;
+    font-size: 16px;
+    color: #333; /* Neutral text for readability */
+    line-height: 1.5;
+}
+
+/* Style for the modal footer */
+.modal-footer {
+    background-color: #f1f1f1; /* Light footer background */
+    border-top: 1px solid #ddd; /* Subtle border */
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Button styles */
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+ </style>
 <div class="modal fade" id="courseMessageModal" tabindex="-1" aria-labelledby="courseMessageLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -386,9 +458,12 @@ function handleStudyClick(course) {
 <br>
     <h1>Welcome to Digi-Studies</h1>
     <p>Your Guide in Research Finding</p>
-    <img class="ccs" src="imgs/ccs.jpg" alt="CCS">
-    <img class="bsba" src="imgs/bsba.jpg" alt="BSBA">
-    <img class="tep" src="imgs/tep.jpg" alt="TEP">
+    <a href="./sections/IT.php"><img class="ccs" src="imgs/ccs.jpg" alt="CCS">
+    </a>
+    <a href="./sections/BA.php"><img class="bsba" src="imgs/bsba.jpg" alt="BSBA">
+    </a>
+    <a href="./sections/TEP.php"><img class="tep" src="imgs/tep.jpg" alt="TEP">
+    </a>
 </div>
 
 <!-- Add Bootstrap JS for the burger menu toggle -->

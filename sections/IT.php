@@ -116,6 +116,7 @@ $result = $conn->query($query);
         padding: 30px;
         margin-top: 20px;
         }
+        
         .study-item {
             background: white;
             border: 1px solid #e0e0e0;
@@ -127,7 +128,6 @@ $result = $conn->query($query);
         }
 
         .study-item:hover {
-            transform: translateY(-3px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
 
@@ -303,6 +303,8 @@ $result = $conn->query($query);
                     <div class="study-abstract">
                         <?php echo htmlspecialchars(substr($row['abstract'], 0, 150)) . '...'; ?>
                     </div>
+
+                    
                     <div class="d-flex align-items-center">
                         <div class="cite-button me-3" onclick="showCitationModal('<?php echo htmlspecialchars($row['author']); ?>', '<?php echo htmlspecialchars($row['title']); ?>', '<?php echo htmlspecialchars($row['year']); ?>')">
                             Cite
