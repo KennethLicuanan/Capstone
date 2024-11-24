@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: login.php");
@@ -18,6 +17,48 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+// Function to fetch new studies added within the past week and delete those not in the database
+function getWeeklyNotifications($conn) {
+    $notifications = [];
+
+    // Query to find studies added within the last 7 days
+    $query = "
+        SELECT s.study_id, s.title, c.course
+        FROM studytbl s
+        JOIN categorytbl c ON s.study_id = c.study_id
+        WHERE s.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    ";
+
+    $result = $conn->query($query);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            // Check if the study is still in the database
+            $checkQuery = "SELECT COUNT(*) as count FROM studytbl WHERE study_id = " . $row['study_id'];
+            $checkResult = $conn->query($checkQuery);
+            $checkRow = $checkResult->fetch_assoc();
+
+            if ($checkRow['count'] == 0) {
+                // Study not found in the database, delete it from notifications
+                $deleteQuery = "DELETE FROM studytbl WHERE study_id = " . $row['study_id'];
+                $conn->query($deleteQuery);
+            } else {
+                // Add valid study to notifications
+                $notifications[] = [
+                    'title' => $row['title'],
+                    'course' => $row['course']
+                ];
+            }
+        }
+    }
+
+    return $notifications;
+}
+
+// Fetch notifications// Fetch notifications and count
+$notifications = getWeeklyNotifications($conn);
+$notificationCount = count($notifications); // Get the count of notifications
 
 $conn->close();
 ?>
@@ -130,7 +171,12 @@ $conn->close();
         <a href="./sections/TEP.php"><i class="fas fa-chalkboard-teacher"></i> Teachers Education Program</a>
         <a href="analytics.php"><i class="fas fa-blackboard"></i> Studies Analysis</a>
         <a href="add_favorite.php"><i class="fas fa-star"></i> Favorites</a>
-        <a href="notification.php"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="notification.php">
+            <i class="fas fa-bell"></i> Notifications 
+            <?php if ($notificationCount > 0): ?>
+                <span class="badge bg-danger"><?php echo $notificationCount; ?></span>
+            <?php endif; ?>
+        </a>        
         <a href="help.php"><i class="fas fa-pencil"></i> Help</a>
         <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>

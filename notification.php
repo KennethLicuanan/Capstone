@@ -60,8 +60,10 @@ function getWeeklyNotifications($conn) {
     return $notifications;
 }
 
-// Fetch notifications
+// Fetch notifications// Fetch notifications and count
 $notifications = getWeeklyNotifications($conn);
+$notificationCount = count($notifications); // Get the count of notifications
+
 ?>
 
 <!DOCTYPE html>
@@ -162,7 +164,22 @@ $notifications = getWeeklyNotifications($conn);
 
         .notification-card .remove-btn:hover {
             text-decoration: underline;
-        }
+            }
+
+            .badge {
+        font-size: 12px;
+        padding: 5px 10px;
+        border-radius: 12px;
+        color: white;
+        position: relative;
+        top: -5px;
+        left: 5px;
+    }
+
+.badge.bg-danger {
+    background-color: #ff6f61; /* Red for notifications */
+}
+
     </style>
 </head>
 <body>
@@ -177,7 +194,12 @@ $notifications = getWeeklyNotifications($conn);
         <a href="./sections/TEP.php"><i class="fas fa-chalkboard-teacher"></i> Teachers Education Program</a>
         <a href="analytics.php"><i class="fas fa-blackboard"></i> Studies Analysis</a>
         <a href="add_favorite.php"><i class="fas fa-star"></i> Favorites</a>
-        <a href="notification.php"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="notification.php">
+            <i class="fas fa-bell"></i> Notifications 
+            <?php if ($notificationCount > 0): ?>
+                <span class="badge bg-danger"><?php echo $notificationCount; ?></span>
+            <?php endif; ?>
+        </a>
         <a href="help.php"><i class="fas fa-pencil"></i> Help</a>
         <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
@@ -197,11 +219,6 @@ $notifications = getWeeklyNotifications($conn);
                             </div>
                             <div class="notification-details">
                                 <span class="notification-course"><em>Course:</em> <?php echo htmlspecialchars($notification['course']); ?></span>
-                            </div>
-                            <div class="mt-2">
-                                <button class="remove-btn">
-                                    <i class="fas fa-times"></i> Dismiss
-                                </button>
                             </div>
                         </div>
                     </div>
