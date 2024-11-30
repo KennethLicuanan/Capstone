@@ -34,11 +34,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_study'])) {
     $stmt->bind_param("ssssssi", $title, $author, $abstract, $keywords, $year, $cNumber, $study_id);
 
     if ($stmt->execute()) {
-        echo '<div class="alert alert-success">Study updated successfully.</div>';
-        header("Refresh: 1; URL=manage.php");
-        exit();
+        echo "
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Study updated successfully.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location = 'manage.php';
+                    }
+                });
+            });
+        </script>";
     } else {
-        echo '<div class="alert alert-danger">Error updating study: ' . $conn->error . '</div>';
+        echo "
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to update study: " . htmlspecialchars($conn->error) . "',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        </script>";
     }
 }
 
@@ -61,7 +83,7 @@ $conn->close();
     <link rel="stylesheet" href="../admin.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background-color: #ffffff;

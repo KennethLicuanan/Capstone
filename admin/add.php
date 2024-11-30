@@ -96,6 +96,7 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -383,8 +384,8 @@ $conn->close();
                 <input type="file" name="uploadFile" id="uploadFile" class="form-control" accept="image/*" required>
             </div>
             
-            <button id="addStudyButton" class="btn btn-primary" onclick="addStudy()" data-bs-toggle="popover" title="Success" data-bs-content="Study added successfully!">Add Study</button>
-            </form>
+            <button type="button" id="addStudyButton" class="btn btn-primary">Add Study</button>            
+        </form>
             
 
                             <!-- Modal for Image Source Selection -->
@@ -670,6 +671,40 @@ function chooseFromGallery() {
     }
 
 
+    document.getElementById('addStudyButton').addEventListener('click', function () {
+        // Check if the form is valid before showing SweetAlert
+        const form = document.querySelector('form');
+        if (!form.checkValidity()) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Form Incomplete',
+                text: 'Please fill out all required fields!',
+            });
+            return;
+        }
+
+        // Show SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to add this study?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, add it!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Success!',
+                    'The study has been added.',
+                    'success'
+                ).then(() => {
+                    // Submit the form after confirmation
+                    form.submit();
+                });
+            }
+        });
+    });
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

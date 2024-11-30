@@ -68,6 +68,7 @@ if (isset($_GET['delete_id'])) {
     <link rel="stylesheet" href="../admin.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { background-color: #ffffff; margin-left: 250px; }
         .sidebar { height: 100%; width: 250px; position: fixed; top: 0; left: 0; background-color: darkblue; font-weight: bold; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; }
@@ -121,7 +122,9 @@ if (isset($_GET['delete_id'])) {
                             <td>" . $user["user_id"] . "</td>
                             <td>" . $user["credentials"] . "</td>
                             <td>" . $user["user_type"] . "</td>
-                            <td><a href='user.php?delete_id=" . $user["user_id"] . "' onclick=\"return confirm('Are you sure you want to delete this user?')\" class='btn btn-danger btn-sm'>Delete</a></td>
+                            <td>
+                                <button class='btn btn-danger btn-sm delete-btn' data-id='" . $user["user_id"] . "'>Delete</button>
+                            </td>
                           </tr>";
                 }
             } else {
@@ -158,6 +161,28 @@ if (isset($_GET['delete_id'])) {
     </table>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.delete-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const userId = this.getAttribute('data-id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `user.php?delete_id=${userId}`;
+                    }
+                });
+            });
+        });
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

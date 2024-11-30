@@ -410,7 +410,7 @@ $result = $conn->query($query);
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <div class="alert alert-info">No studies found for the BA course.</div>
+            <div class="alert alert-info">No studies found for the Information Technology course.</div>
         <?php endif; ?>
     </ul>
 </div>
