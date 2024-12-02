@@ -344,7 +344,7 @@ $result = $stmt->get_result();
             </div>
         <?php endwhile; ?>
     <?php else: ?>
-        <p>No favorite studies found.</p>
+        <p>You Currently Don't have any favorites.</p>
     <?php endif; ?>
 </div>
 

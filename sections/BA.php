@@ -337,25 +337,45 @@ $result = $conn->query($query);
     </div>
 </form>
 
+<?php
+// Function to format authors' names
+function formatAuthors($authorString) {
+    $authors = explode(',', $authorString); // Split authors by comma
+    $formattedAuthors = [];
 
-    <!-- Study List -->
-    <ul class="study-list list-unstyled">
-        <?php if ($result->num_rows > 0): ?>
-            <?php while ($row = $result->fetch_assoc()): ?>
-                <li class="study-item">
-                    <a class="study-title" data-bs-toggle="modal" data-bs-target="#studyModal<?php echo $row['study_id']; ?>">
-                        <?php echo htmlspecialchars($row['title']); ?>
-                    </a>
-                    <div class="study-author-year">
-                        <?php echo htmlspecialchars($row['author']); ?> - <?php echo htmlspecialchars($row['year']); ?>
-                    </div>
-                    <div class="study-abstract">
-                        <?php echo htmlspecialchars(substr($row['abstract'], 0, 150)) . '...'; ?>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class="cite-button me-3" onclick="showCitationModal('<?php echo htmlspecialchars($row['author']); ?>', '<?php echo htmlspecialchars($row['title']); ?>', '<?php echo htmlspecialchars($row['year']); ?>')">
-                            Cite
-                        </div>
+    foreach ($authors as $author) {
+        $parts = preg_split('/\s+/', trim($author)); // Split by space and trim extra spaces
+        $lastName = array_pop($parts); // Assume last part is the last name
+        $firstNameInitial = isset($parts[0]) ? strtoupper($parts[0][0]) . '.' : ''; // First name initial
+        $middleInitial = isset($parts[1]) ? strtoupper($parts[1][0]) . '.' : ''; // Middle initial if exists
+
+        // Combine into formatted name
+        $formattedAuthors[] = $lastName . ', ' . $firstNameInitial . ($middleInitial ? ' ' . $middleInitial : '');
+    }
+
+    return implode(', ', $formattedAuthors); // Join authors with a comma
+}
+?>
+
+<!-- Study List -->
+<ul class="study-list list-unstyled">
+    <?php if ($result->num_rows > 0): ?>
+        <?php while ($row = $result->fetch_assoc()): ?>
+            <li class="study-item">
+                <a class="study-title" data-bs-toggle="modal" data-bs-target="#studyModal<?php echo $row['study_id']; ?>">
+                    <?php echo htmlspecialchars($row['title']); ?>
+                </a>
+                <div class="study-author-year">
+                    <?php echo formatAuthors(htmlspecialchars($row['author'])); ?> - <?php echo htmlspecialchars($row['year']); ?>
+                </div>
+                <div class="study-abstract">
+                    <?php echo htmlspecialchars(substr($row['abstract'], 0, 150)) . '...'; ?>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                <div class="cite-button me-3" onclick="showCitationModal('<?php echo formatAuthors(htmlspecialchars($row['author'])); ?>', '<?php echo htmlspecialchars($row['title']); ?>', '<?php echo htmlspecialchars($row['year']); ?>')">
+                    Cite
+                </div>
 
                         <!-- Add to Favorites Button -->
                         <button class="btn btn-sm" onclick="addToFavorites(<?php echo $row['study_id']; ?>)">
@@ -410,7 +430,7 @@ $result = $conn->query($query);
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
-            <div class="alert alert-info">No studies found for the BA course.</div>
+            <div class="alert alert-info">No studies found for the Business Administration course.</div>
         <?php endif; ?>
     </ul>
 </div>
@@ -444,7 +464,7 @@ function showCitationModal(author, title, year) {
     const sentenceCaseTitle = toSentenceCase(title);
     
     // Generate the citation in APA 7th edition format with sentence case and additional text
-    const citation = `${author} (${year}). ${sentenceCaseTitle}. *Unpublished undergrad thesis [ Northern Bukidnon State College ] Digi-Studies*.`;
+    const citation = `${author} (${year}). ${sentenceCaseTitle}. *Unpublished undergrad thesis [ Northern Bukidnon State College ]*.`;
     
     // Set the citation text in the textarea
     document.getElementById('citationText').value = citation;

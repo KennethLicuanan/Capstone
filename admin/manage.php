@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
     <link rel="stylesheet" href="../admin.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background-color: #ffffff;
@@ -205,9 +206,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
     <a href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
-<div class="content">
-    <h2>Welcome to Digi-Studies</h2>
-
+<div class="content"><br>
+    <h2>Welcome to Managing Digi-Studies</h2>
+<br>
     <div class="row">
 <!-- Search Card -->
 <div class="col-md-6 study-card mb-4">
@@ -225,14 +226,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
     </div>
 </div>
 
-
-    <!-- Archived Studies Card -->
+    <!-- Studies Card -->
     <div class="col-md-6 study-card mb-4">
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">Add Studies</h5>
                 <p class="card-text">Access Adding Study.</p>
-                <a href="add.php" class="btn btn-secondary">Want to Add Studies?</a>
+                <a href="add.php" class="btn btn-warning">Add?</a>
             </div>
         </div>
     </div>
@@ -269,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
                                 <input type="hidden" name="study_id" value="<?= $row['study_id'] ?>">
                                 <button type="submit" class="btn btn-primary btn-sm">Update</button>
                             </form>
-                            <form action="delete_study.php" method="POST">
+                            <form action="delete_study.php" method="POST" onsubmit="return confirmDeletion(this)">
                                 <input type="hidden" name="study_id" value="<?= $row['study_id'] ?>">
                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                             </form>
@@ -298,6 +298,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
             abstractContent.style.display = "inline";
             fullAbstract.style.display = "none";
         }
+    }
+
+       // SweetAlert Confirmation Alert
+       function confirmDeletion(form) {
+        event.preventDefault(); // Prevent form submission
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This will be saved on Archives",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Submit the form if confirmed
+            }
+        });
+        return false; // Prevent default form submission
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

@@ -8,7 +8,19 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit();
 }
 
+// Database connection
+$servername = "localhost";
+$username = "root"; // Use your database username
+$password = ""; // Use your database password
+$dbname = "capstonedb"; // Database name
 
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 // Function to fetch new studies added within the past week and delete those not in the database
 function getWeeklyNotifications($conn) {
